@@ -46,12 +46,15 @@ target_link_directories(${CMAKE_PROJECT_NAME} PRIVATE
 target_sources(${CMAKE_PROJECT_NAME} PRIVATE
     # Add user sources here
         Lib/stepper/Src/stepper.c
+        Lib/stepper/Src/stm32f1_hal_impl.c
+        Lib/servo/Src/servo.c
 )
 
 # Add include paths
 target_include_directories(${CMAKE_PROJECT_NAME} PRIVATE
     # Add user defined include paths
         Lib/stepper/Inc
+        Lib/servo/Inc
 )
 
 # Add project symbols (macros)

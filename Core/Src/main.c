@@ -25,7 +25,8 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-
+#include "servo.h"
+#include "stepper.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -46,7 +47,8 @@
 /* Private variables ---------------------------------------------------------*/
 
 /* USER CODE BEGIN PV */
-
+Servo_Handle_t servo1;
+StepperMotor* stepperMotor1;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -96,7 +98,22 @@ int main(void)
   MX_TIM4_Init();
   MX_USART1_UART_Init();
   /* USER CODE BEGIN 2 */
+   StepperConfig StepperConfigStruct = {
+     .htim = &htim2,
+     .timer_channel = TIM_CHANNEL_1,
+     .dir_port = Motor1_Dir_GPIO_Port,
+     .dir_pin = Motor1_Dir_Pin,
+     .dir_active_level = 1,
 
+     .en_port = Motor1_Ena_GPIO_Port,
+     .en_pin = Motor1_Ena_Pin,
+     .en_active_level = 0,
+
+     .steps_per_rev = 3200,
+   };
+   stepperMotor1 = stepper_create(&StepperConfigStruct);
+  stepper_test_run(stepperMotor1, 1);
+  Servo_Init(&servo1, &htim2, TIM_CHANNEL_1, 72000000, 72);
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -106,6 +123,9 @@ int main(void)
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
+
+    HAL_GPIO_TogglePin(LED1_GPIO_Port, LED1_Pin);
+    HAL_Delay(1000);
   }
   /* USER CODE END 3 */
 }
@@ -150,7 +170,12 @@ void SystemClock_Config(void)
 }
 
 /* USER CODE BEGIN 4 */
+void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) {
 
+  if (htim == &htim2) {
+    one_period_done_callback(stepperMotor1);
+  }
+}
 /* USER CODE END 4 */
 
 /**

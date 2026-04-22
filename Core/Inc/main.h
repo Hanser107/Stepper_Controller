@@ -79,6 +79,12 @@ void Error_Handler(void);
 #define Motor4_Ena_GPIO_Port GPIOB
 #define Motor4_Dir_Pin GPIO_PIN_5
 #define Motor4_Dir_GPIO_Port GPIOB
+#define KEY1_Pin GPIO_PIN_7
+#define KEY1_GPIO_Port GPIOB
+#define LED1_Pin GPIO_PIN_8
+#define LED1_GPIO_Port GPIOB
+#define LED2_Pin GPIO_PIN_9
+#define LED2_GPIO_Port GPIOB
 
 /* USER CODE BEGIN Private defines */
 
