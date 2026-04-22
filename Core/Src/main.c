@@ -48,7 +48,7 @@
 
 /* USER CODE BEGIN PV */
 Servo_Handle_t servo1;
-StepperMotor* stepperMotor1;
+stepper_motor_t* stepperMotor1;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -111,9 +111,24 @@ int main(void)
 
      .steps_per_rev = 3200,
    };
-   stepperMotor1 = stepper_create(&StepperConfigStruct);
-  stepper_test_run(stepperMotor1, 1);
-  Servo_Init(&servo1, &htim2, TIM_CHANNEL_1, 72000000, 72);
+  MoveConfig_t config = {
+    .mode = MOVE_MODE_POSITION,
+
+    .direction = 1,
+
+    .start_speed = 500,
+    .const_speed = 1000,
+    .end_speed = 500,
+
+    .acc_steps = 500,
+    .dec_steps = 500,
+    .total_step = 1000
+  };
+  stepperMotor1 = stepper_create(&StepperConfigStruct);
+  Stepper_Start(&config, stepperMotor1);
+
+  //stepper_test_run(stepperMotor1, 1);
+  //Servo_Init(&servo1, &htim2, TIM_CHANNEL_1, 72000000, 72);
   /* USER CODE END 2 */
 
   /* Infinite loop */
