@@ -36,7 +36,7 @@ extern "C" {
 
 /* Exported types ------------------------------------------------------------*/
 /* USER CODE BEGIN ET */
-
+extern uint32_t system_tick_ms;
 /* USER CODE END ET */
 
 /* Exported constants --------------------------------------------------------*/

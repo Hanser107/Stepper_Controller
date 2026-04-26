@@ -98,4 +98,6 @@ void one_period_done_callback(stepper_motor_t *motor);
 
 motor_err_t Stepper_Start(MoveConfig_t * config, stepper_motor_t * motor);
 
+motor_err_t stepper_continuous_stop(stepper_motor_t *motor);
+
 #endif

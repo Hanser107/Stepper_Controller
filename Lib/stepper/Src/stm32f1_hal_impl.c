@@ -69,10 +69,6 @@ static void free_gpio(StepperGpio *gpio) {
     }
 }
 
-/* 定时器中断回调（需要在 stm32f4xx_it.c 中调用此函数） */
-void Stepper_HAL_TIM_OC_DelayElapsedCallback(TIM_HandleTypeDef *htim) {
-
-}
 
 /* ---------- 实现 HAL 接口函数 ---------- */
 static StepperTimer* timer_init_impl(const StepperTimerConfig *cfg) {
@@ -95,18 +91,38 @@ static void timer_start_pulse_impl(StepperTimer *timer) {
         HAL_TIM_PWM_Stop_IT(timer->htim, timer->channel);
         timer->is_running = false;
     }
+
     HAL_TIM_Base_Start_IT(timer->htim);
     HAL_TIM_PWM_Start_IT(timer->htim, timer->channel);
 
-
     timer->is_running = true;
-
 }
 
 static void timer_set_freq_impl(StepperTimer *timer, uint32_t freq) {
-    if (!timer) return;
-    freq = 200;
-    __HAL_TIM_SET_AUTORELOAD(timer->htim, freq);
+    if (!timer || !timer->htim) return;
+
+    /* 防止除零 */
+    if (freq == 0) {
+        freq = 1;
+    }
+
+    /*
+     * 定时器计数频率 = 72MHz / (Prescaler + 1)
+     * 固定预分频为 71 → 分频系数 72 → 计数频率 1MHz (1us/tick)
+     */
+    const uint32_t timer_clock_hz = 1000000;   // 1MHz
+    uint32_t arr_value = (timer_clock_hz / freq) - 1;
+
+    /* ARR 为 16 位寄存器，限制范围 */
+    if (arr_value > 0xFFFF) {
+        arr_value = 0xFFFF;   // 对应最低频率约 15.26 Hz
+    }
+    if (arr_value < 1) {
+        arr_value = 1;        // 对应最高频率 500 kHz（步进电机一般不会用到）
+    }
+
+    __HAL_TIM_SET_AUTORELOAD(timer->htim, arr_value);
+    __HAL_TIM_SET_COMPARE(timer->htim, timer->channel, arr_value / 2);
 }
 
 static void timer_stop_pulse_impl(StepperTimer *timer) {

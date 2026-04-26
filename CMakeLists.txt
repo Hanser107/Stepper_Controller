@@ -48,6 +48,9 @@ target_sources(${CMAKE_PROJECT_NAME} PRIVATE
         Lib/stepper/Src/stepper.c
         Lib/stepper/Src/stm32f1_hal_impl.c
         Lib/servo/Src/servo.c
+        Lib/led/Src/gpio_led.c
+        Lib/button/Src/gpio_button.c
+
 )
 
 # Add include paths
@@ -55,6 +58,8 @@ target_include_directories(${CMAKE_PROJECT_NAME} PRIVATE
     # Add user defined include paths
         Lib/stepper/Inc
         Lib/servo/Inc
+        Lib/led/Inc
+        Lib/button/Inc
 )
 
 # Add project symbols (macros)
