@@ -55,7 +55,7 @@ void MX_GPIO_Init(void)
 
   /*Configure GPIO pin Output Level */
   HAL_GPIO_WritePin(GPIOB, Motor3_DIr_Pin|Motor3_Ena_Pin|Motor1_Ena_Pin|Motor1_Dir_Pin
-                          |Motor4_Ena_Pin|Motor4_Dir_Pin|LED1_Pin|LED2_Pin, GPIO_PIN_RESET);
+                          |Motor4_Ena_Pin|Motor4_Dir_Pin|LED1_Pin|LED2_Pin, GPIO_PIN_SET);
 
   /*Configure GPIO pins : Motor2_Dir_Pin Motor2_Ena_Pin Extend_IO1_Pin Extend_IO2_Pin
                            Extend_IO3_Pin */

@@ -50,7 +50,11 @@ target_sources(${CMAKE_PROJECT_NAME} PRIVATE
         Lib/servo/Src/servo.c
         Lib/led/Src/gpio_led.c
         Lib/button/Src/gpio_button.c
-
+        Lib/can/Src/bsp_can.c
+        Lib/motor/Src/motor.c
+        Lib/printer/Src/printer.c
+        Task/bsp_init/Src/bsp_init.c
+        Task/move/Src/move.c
 )
 
 # Add include paths
@@ -60,6 +64,11 @@ target_include_directories(${CMAKE_PROJECT_NAME} PRIVATE
         Lib/servo/Inc
         Lib/led/Inc
         Lib/button/Inc
+        Lib/can/Inc
+        Lib/motor/Inc
+        Lib/printer/Inc
+        Task/bsp_init/Inc
+        Task/move/Inc
 )
 
 # Add project symbols (macros)

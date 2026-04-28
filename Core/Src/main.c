@@ -25,10 +25,8 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-#include "gpio_led.h"
-#include "gpio_button.h"
-#include "servo.h"
-#include "stepper.h"
+#include <string.h>
+#include "bsp_init.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -49,13 +47,12 @@
 /* Private variables ---------------------------------------------------------*/
 
 /* USER CODE BEGIN PV */
+/* 系统时间计数(ms) */
 uint32_t system_tick_ms = 0;
+/* 通信消息变量 */
+//CanMessage_t test_message;
 
-gpio_led_t gpio_led;
-gpio_button_t gpio_button;
-button_event_t gpio_button_event;
-Servo_Handle_t servo1;
-stepper_motor_t* stepperMotor1;
+
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -105,37 +102,11 @@ int main(void)
   MX_TIM4_Init();
   MX_USART1_UART_Init();
   /* USER CODE BEGIN 2 */
-  gpio_led_init(&gpio_led, LED1_GPIO_Port, LED1_Pin);
-  gpio_button_init(&gpio_button, KEY1_GPIO_Port, KEY1_Pin, 0);
-   StepperConfig StepperConfigStruct = {
-     .htim = &htim2,
-     .timer_channel = TIM_CHANNEL_1,
-     .dir_port = Motor1_Dir_GPIO_Port,
-     .dir_pin = Motor1_Dir_Pin,
-     .dir_active_level = 1,
+  bsp_init();
 
-     .en_port = Motor1_Ena_GPIO_Port,
-     .en_pin = Motor1_Ena_Pin,
-     .en_active_level = 0,
 
-     .steps_per_rev = 3200,
-   };
-  MoveConfig_t config = {
-    .mode = MOVE_MODE_CONTINUOUS,
 
-    .direction = 1,
 
-    .start_speed = 500,
-    .const_speed = 2000,
-    .end_speed = 500,
-
-    .acc_steps = 1000,
-    .dec_steps = 1000,
-    .total_step = 2200,
-  };
-   stepperMotor1 = stepper_create(&StepperConfigStruct);
-   Stepper_Start(&config, stepperMotor1);
-  // Servo_Init(&servo1, &htim2, TIM_CHANNEL_1, 72000000, 72);
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -145,7 +116,10 @@ int main(void)
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
+    if (motor_set_current(0x200, 400))
+    led_toggle(&gpio_led1.base);
 
+    HAL_Delay(500);
   }
   /* USER CODE END 3 */
 }
@@ -198,6 +172,19 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) {
   }
 }
 
+void HAL_CAN_RxFifo0MsgPendingCallback(CAN_HandleTypeDef* hcan)
+{
+  CAN_RxHeaderTypeDef rxHeader;
+  uint8_t rxData[8];
+
+  if (HAL_CAN_GetRxMessage(hcan, CAN_RX_FIFO0, &rxHeader, rxData) == HAL_OK)
+  {
+    if (rxHeader.StdId >= 0x200 && rxHeader.StdId <= 0x207)  // C610电调范围
+    {
+      led_toggle(&gpio_led2.base);  // 证明收到了
+    }
+  }
+}
 
 /* USER CODE END 4 */
 
@@ -212,6 +199,9 @@ void Error_Handler(void)
   __disable_irq();
   while (1)
   {
+    HAL_Delay(300);
+    HAL_GPIO_TogglePin(LED1_GPIO_Port, LED1_Pin);
+    HAL_GPIO_TogglePin(LED2_GPIO_Port, LED2_Pin);
   }
   /* USER CODE END Error_Handler_Debug */
 }
